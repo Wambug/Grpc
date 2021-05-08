@@ -1,0 +1,23 @@
+FROM golang:alpine as build_env
+
+ENV GO111MODULE=on
+
+RUN apk update && apk add bash ca-certificates git gcc g++ libc-dev
+
+RUN mkdir /chatapp_grpc
+
+RUN mkdir -p /chatapp_grpc/proto
+
+WORKDIR /chatapp_grpc
+
+COPY ./proto/service.pb.go /chatapp_grpc/proto
+COPY ./main.go /chatapp_grpc
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
+RUN go build -o chatapp_grpc .
+
+CMD .chatapp_grpc
